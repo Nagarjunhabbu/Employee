@@ -4,8 +4,9 @@ import (
 	"context"
 	"employee/internal/model"
 	"fmt"
-	"gorm.io/gorm"
 	"time"
+
+	"gorm.io/gorm"
 )
 
 type EmployeeStorer interface {
@@ -66,7 +67,19 @@ func (e employeeStore) Update(ctx context.Context, id int, employee model.Employ
 }
 
 func (e employeeStore) Delete(ctx context.Context, id int) error {
-	result := e.db.Delete(&model.Employee{}, id)
+	sqlQuery := "DELETE FROM employee_insurance WHERE employee_id=?"
+
+	result := e.db.Exec(sqlQuery, id)
+	if result.Error != nil {
+		return result.Error
+	}
+
+	sqlQuery = "DELETE FROM employee_salary WHERE employee_id=?"
+	result = e.db.Exec(sqlQuery, id)
+	if result.Error != nil {
+		return result.Error
+	}
+	result = e.db.Delete(&model.Employee{}, id)
 	if result.Error != nil {
 		return result.Error
 	}

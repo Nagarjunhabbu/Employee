@@ -4,8 +4,9 @@ import (
 	"context"
 	"employee/internal/model"
 	"fmt"
-	"gorm.io/gorm"
 	"time"
+
+	"gorm.io/gorm"
 )
 
 type EmployeeInsuranceStorer interface {
@@ -37,6 +38,16 @@ func (e employeeInsuranceStore) Create(ctx context.Context, emp_id int, ins mode
 		return model.Insurance{}, result.Error
 	}
 	return e.GetByEmpId(ctx, emp_id)
+}
+
+func (e employeeInsuranceStore) Delete(ctx context.Context, emp_id int) error {
+	sqlQuery := "DELETE employee_insurance WHERE employee_id=?"
+
+	result := e.db.Exec(sqlQuery, emp_id)
+	if result.Error != nil {
+		return result.Error
+	}
+	return nil
 }
 
 func NewEmployeeInsurance(db *gorm.DB) EmployeeInsuranceStorer {

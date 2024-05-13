@@ -4,8 +4,9 @@ import (
 	"context"
 	"employee/internal/model"
 	"fmt"
-	"gorm.io/gorm"
 	"time"
+
+	"gorm.io/gorm"
 )
 
 type EmployeeSalaryStorer interface {
@@ -35,7 +36,15 @@ func (e employeeSalaryStore) Create(ctx context.Context, emp_id int, sal model.S
 	}
 	return e.GetByEmpId(ctx, emp_id)
 }
+func (e employeeSalaryStore) Delete(ctx context.Context, emp_id int) error {
+	sqlQuery := "DELETE employee_salary WHERE employee_id=?"
 
+	result := e.db.Exec(sqlQuery, emp_id)
+	if result.Error != nil {
+		return result.Error
+	}
+	return nil
+}
 func NewEmployeeSalary(db *gorm.DB) EmployeeSalaryStorer {
 	return &employeeSalaryStore{db: db}
 }
